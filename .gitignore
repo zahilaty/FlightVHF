@@ -1,6 +1,6 @@
 *.html
 *.bin
-LogFile*.txt
+*.txt
 *.slx
 *.slxc
 *.xml
@@ -9,5 +9,3 @@ LogFile*.txt
 *.ipynb
 *.pyc
 *.wav
-RawPythonSolution/FilesIDownloadWithoutPIP/*
-RawPythonSolution/.idea/*
