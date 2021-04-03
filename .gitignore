@@ -1,0 +1,13 @@
+*.html
+*.bin
+LogFile*.txt
+*.slx
+*.slxc
+*.xml
+*.fda
+*.docx
+*.ipynb
+*.pyc
+*.wav
+RawPythonSolution/FilesIDownloadWithoutPIP/*
+RawPythonSolution/.idea/*
