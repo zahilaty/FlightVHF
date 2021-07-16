@@ -1,5 +1,6 @@
 *.html
 *.bin
+*.dat
 *.txt
 *.slx
 *.slxc

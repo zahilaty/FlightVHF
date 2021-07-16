@@ -1,7 +1,8 @@
 clc;clear all;close all;
+addpath('D:\Utilities')
 %% load the signal
-file = "D:\Flight\Records_23_3_2021.bin";
-%file =  "C:\Users\Zahi\Desktop\TmpFileNameForDebug.bin"
+%file = "D:\Flight\Records_23_3_2021.bin";
+file =  "Records_23_3_2021.bin"
 fileID = fopen(file,'r');
 A = fread(fileID,'single');
 fclose(fileID);
