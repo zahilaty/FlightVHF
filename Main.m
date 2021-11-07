@@ -1,5 +1,5 @@
 clc;clear all;close all;
-addpath('D:\Utilities')
+addpath('E:\Projects\Utilities')
 DirPath = 'Haifa';
 FilesList = dir(DirPath); 
 
@@ -17,23 +17,32 @@ min_bytes_size = fs*mintime*(32/8)*2;
 ValidInds = Inds(FileSize(Inds)>min_bytes_size);
 M = length(ValidInds);
 
-%% Features
-DFTsize = 1024;
-SpectrumMat =zeros(M,DFTsize); %freq resolution is 12.5e3/1024= 12Hz
+%% Extracting Audio Features
+maxtime = 3.2; %[sec] 2.5->248 , 5->606
+NumBands = 64;
+%MelSpectrumArray =zeros(M,NumBands,498,'single'); %time value determind hard coded by dommy sample!! freq resolution isn't relevant because it is logaritmic scale
+DemodedMat = zeros(M,round(maxtime*fs),'single');
 FreqOffsetMat = zeros(M,1);
 
+h = waitbar(0,'Processing and Demodulating signals...');
 for k = 1:1:M
     sig = LoadBinFile([DirPath,'\',FilesList(ValidInds(k)).name]);
     [sig_decimation,FreqOffsetMat(k)] = GenericAMPreProcessing(sig,cfg);
-    %SpectrumMat(k,:) = Spectrum_with_2k_size(sig,log2(DFTsize));
+    demod = GenericAMdemodulation(sig_decimation);
+    demod = PadOrChop(demod,round(maxtime*fs));
+    %MelSpectrumArray(k,:,:) = melSpectrogram(demod,fs,'NumBands',NumBands);
+    DemodedMat(k,:) = demod;
+    waitbar(k / M)
 end
+close(h)
+save('HaifaDemoded.mat','DemodedMat');
 
 %% TSNE
 % Y = tsne(abs(SpectrumMat));
 % scatter(Y(:,1),Y(:,2),'.');
 
-%% 
-scatter(FreqOffsetMat,FilesList(ValidInds).datenum)
+%% Useless scatter plot
+scatter(FreqOffsetMat,[FilesList(ValidInds).datenum])
 
 %% sample some converstion
 rand_ind = randi(M);
@@ -41,15 +50,13 @@ for k = rand_ind:rand_ind+3
     sig = LoadBinFile([DirPath,'\',FilesList(ValidInds(k)).name]);
     sig_decimation = GenericAMPreProcessing(sig,cfg);
     %soundsc(abs(sig_decimation),cfg.fs/cfg.Decimation_factor)
-    demod = GenericAMdemodulation(sig);
+    demod = GenericAMdemodulation(sig_decimation);
     sound(demod,cfg.fs/cfg.Decimation_factor);
-    pause(length(sig_decimation)/(cfg.fs/cfg.Decimation_factor)+1);
+    pause(length(sig_decimation)/(cfg.fs/cfg.Decimation_factor)+1); %Wait until the sound is over + 1 sec
 end
 
-
-
-
 %% What can be classified?
-% english \ hebrew
-% aircraft \ tower
-% army \ civilian?
+% english \ hebrew (only pluto)
+% aircraft \ tower (both)
+% army \ civilian (only pluto)
+% word trigger (can be both)
