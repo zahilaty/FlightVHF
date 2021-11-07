@@ -10,3 +10,5 @@
 *.ipynb
 *.pyc
 *.wav
+*.pth
+*.mat
