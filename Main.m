@@ -1,6 +1,6 @@
 clc;clear all;close all;
 addpath('E:\Projects\Utilities')
-DirPath = 'Haifa';
+DirPath = 'Pluto'; %'Haifa'
 FilesList = dir(DirPath); 
 
 %% Records Configs
@@ -18,7 +18,9 @@ ValidInds = Inds(FileSize(Inds)>min_bytes_size);
 M = length(ValidInds);
 
 %% Extracting Audio Features
-maxtime = 3.2; %[sec] 2.5->248 , 5->606
+%maxtimen note: if we will choose it to be too big then a alot of spectograms will have too
+%many zeros at the end and we will save a big file with redundant data
+maxtime = 3.2; %[sec] 2.5->248 , 5->606 
 NumBands = 64;
 %MelSpectrumArray =zeros(M,NumBands,498,'single'); %time value determind hard coded by dommy sample!! freq resolution isn't relevant because it is logaritmic scale
 DemodedMat = zeros(M,round(maxtime*fs),'single');
@@ -35,7 +37,8 @@ for k = 1:1:M
     waitbar(k / M)
 end
 close(h)
-save('HaifaDemoded.mat','DemodedMat');
+%save('HaifaDemoded.mat','DemodedMat');
+%save('PlutoDemoded.mat','DemodedMat');
 
 %% TSNE
 % Y = tsne(abs(SpectrumMat));
@@ -56,7 +59,15 @@ for k = rand_ind:rand_ind+3
 end
 
 %% What can be classified?
-% english \ hebrew (only pluto)
-% aircraft \ tower (both)
+% english \ hebrew (both)
+% aircraft \ tower (I think I got from haifa only aircraft and from pluto only the tower)
 % army \ civilian (only pluto)
-% word trigger (can be both)
+% word trigger (both)
+
+%% A one time run:
+% load('E:\Projects\Flight\DLCode\HaifaDemoded.mat')
+% HaifaDemoded = DemodedMat;
+% load('E:\Projects\Flight\DLCode\PlutoDemoded.mat')
+% PlutoDemoded = DemodedMat;
+% DemodedMat = [HaifaDemoded;PlutoDemoded];
+% save('CombinedMat.mat','DemodedMat');
