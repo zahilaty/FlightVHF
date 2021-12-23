@@ -70,4 +70,4 @@ end
 % load('E:\Projects\Flight\DLCode\PlutoDemoded.mat')
 % PlutoDemoded = DemodedMat;
 % DemodedMat = [HaifaDemoded;PlutoDemoded];
-% save('CombinedMat.mat','DemodedMat');
+% save('CombinedDemoded.mat','DemodedMat');
