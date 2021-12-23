@@ -12,6 +12,17 @@ import pandas as pd
 import torchaudio
 import scipy.io as sio
 
+class ProcessedDataset(Dataset):
+    def __init__(self,Path):
+        [self.tensor,self.labels] = torch.load(Path)
+        self.Len = self.tensor.shape[0]
+    def __len__(self):
+        return self.Len
+    def __getitem__(self, idx):
+        signal = self.tensor[idx,::] 
+        label = self.labels[idx] 
+        return signal,label
+
 class DemodDataset(Dataset):
 
     def __init__(self,
@@ -23,7 +34,7 @@ class DemodDataset(Dataset):
                  num_samples = 40000,
                  device = "cpu"):
         self.annotations = pd.read_csv(annotations_file)
-        self.audio_mat = sio.loadmat(audio_file)["DemodedMat"]
+        self.audio_mat = sio.loadmat(audio_file)["DemodedMat"] #for now it is 3.2 second of burst sampled at 12.5Khz = 40,000 samples
         self.desired_label = desired_label
         self.device = device
         self.transformation = transformation.to(self.device)
@@ -42,7 +53,7 @@ class DemodDataset(Dataset):
         #signal = self._cut_if_necessary(signal)          #done in matlab
         #signal = self._right_pad_if_necessary(signal)    #done in matlab
         signal = self.transformation(signal)
-        signal = 20.0*torch.log10(signal)
+        signal = 20.0*torch.log10(signal+1e-10)
         return signal, label
 
     # def _cut_if_necessary(self, signal):
@@ -70,6 +81,8 @@ class DemodDataset(Dataset):
     #     return signal
     
     
+#####  It is good valerio implemented a "main" function so we can test the dataset directly without help of external script 
+   
 if __name__ == "__main__":
     ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
     AUDIO_FILE = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat'
