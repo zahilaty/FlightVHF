@@ -44,7 +44,7 @@ for idx, [signal,label] in enumerate(dataloader):
     X = torch.cat((X,signal),dim=0)
     Y = torch.cat((Y,label),dim=0)
     
-torch.save([X,Y],'ProcessedTorchData')
+torch.save([X,Y],'ProcessedTorchData.pt')
 
 ### I ran this code offline to make sure the paradigma is correct:    
 # torch.save([signal,label],'tmp')

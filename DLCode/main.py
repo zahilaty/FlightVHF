@@ -17,30 +17,30 @@ import sys
 sys.path.insert(1, 'E:\\Projects\\Utilities') # insert at 1, 0 is the script path (or '' in REPL)
 from MyMetrics import ContrastiveLoss 
 from DemodDataset import DemodDataset , ProcessedDataset
-from RandomAugmentationForSpeech import AddGaussianNoise,MyEmbeddingAndProjectionNet
+from NetAndRandAugmentations import AddGaussianNoise,MyEmbeddingAndProjectionNet
 import time
 
 ### Paths and consts ### 
-ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
-AUDIO_FILE = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat'
-desired_label = 'HebOrEng'
-SAMPLE_RATE = 12500
-NUM_SAMPLES = 40000
-device = "cuda"
+#ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
+#AUDIO_FILE = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat'
+#desired_label = 'HebOrEng'
+#SAMPLE_RATE = 12500
+#NUM_SAMPLES = 40000
+#device = "cuda"
 
 ### HyperParams ###
 BATCH_SIZE = 64
 EPOCHS = 200
 LEARNING_RATE = 0.003
-mel_spectrogram = torchaudio.transforms.MelSpectrogram(sample_rate=SAMPLE_RATE,n_fft=1024,hop_length=400,n_mels=64)
+#mel_spectrogram = torchaudio.transforms.MelSpectrogram(sample_rate=SAMPLE_RATE,n_fft=1024,hop_length=400,n_mels=64)
 
 ### DataSets ###
 #demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogram,SAMPLE_RATE,NUM_SAMPLES,device)
-demod_ds = ProcessedDataset('ProcessedTorchData') #calling the after-processed dataset
+demod_ds = ProcessedDataset('ProcessedTorchData.pt') #calling the after-processed dataset
 train_size = int(0.9 * len(demod_ds))
 test_size = len(demod_ds) - train_size
-#train_set, val_set = torch.utils.data.random_split(demod_ds, [train_size, test_size]) #I run this ones and saved the indexes with torch.save([train_set.indices,val_set.indices],'RandIndsSplit')
-[l1,l2] = torch.load('RandIndsSplit') # we need to save the indexes so we wont have data contimanation
+#train_set, val_set = torch.utils.data.random_split(demod_ds, [train_size, test_size]) #I run this ones and saved the indexes with torch.save([train_set.indices,val_set.indices],'RandIndsSplit.pt')
+[l1,l2] = torch.load('RandIndsSplit.pt') # we need to save the indexes so we wont have data contimanation
 train_set = torch.utils.data.Subset(demod_ds, l1)
 val_set = torch.utils.data.Subset(demod_ds, l2)
 print(f"There are {len(train_set)} samples in the train set and {len(val_set)} in validation set.")
