@@ -16,7 +16,7 @@ from DemodDataset import DemodDataset
 
 ### Paths and consts ### 
 ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
-AUDIO_FILE = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat'
+AUDIO_FILE = 'E:\Projects\Flight\DLCode\CombinedDemoded.mat'
 desired_label = 'HebOrEng'
 SAMPLE_RATE = 12500
 NUM_SAMPLES = 40000
