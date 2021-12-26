@@ -36,15 +36,21 @@ demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogra
 dataloader = DataLoader(demod_ds, batch_size=1)
  
 X = torch.tensor([]).cuda()
-Y = torch.tensor([])
+Y1 = torch.tensor([])
+Y2 = torch.tensor([])
+Y3 = torch.tensor([])
+Y4 = torch.tensor([])
 
-for idx, [signal,label] in enumerate(dataloader):
+for idx, [signal,label_1, label_2, label_3, label_4] in enumerate(dataloader):
     #torch.save([torch.squeeze(signal),label],'ProcessedTorchData' + '\\' + str(idx))
     #print(signal.shape) #torch.Size([1, 64, 101]) - i.e. torch is saving with the batch dim, altough it is a single dim
     X = torch.cat((X,signal),dim=0)
-    Y = torch.cat((Y,label),dim=0)
+    Y1 = torch.cat((Y1,label_1),dim=0)
+    Y2 = torch.cat((Y2,label_2),dim=0)
+    Y3 = torch.cat((Y3,label_3),dim=0)
+    Y4 = torch.cat((Y4,label_4),dim=0)
     
-torch.save([X,Y],'ProcessedTorchData.pt')
+torch.save([X,Y1,Y2,Y3,Y4],'ProcessedTorchData.pt')
 
 ### I ran this code offline to make sure the paradigma is correct:    
 # torch.save([signal,label],'tmp')

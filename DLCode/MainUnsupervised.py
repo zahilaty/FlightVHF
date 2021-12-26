@@ -6,19 +6,7 @@ Created on Mon Nov  1 13:51:59 2021
 """
 
 ### Imports ###
-import numpy as np
-import torch
-import torchaudio
-import torchvision
-from torchvision import transforms
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-import sys
-sys.path.insert(1, 'E:\\Projects\\Utilities') # insert at 1, 0 is the script path (or '' in REPL)
-from MyMetrics import ContrastiveLoss 
-from DemodDataset import DemodDataset , ProcessedDataset
-from NetAndRandAugmentations import AddGaussianNoise,MyEmbeddingAndProjectionNet
-import time
+from All_imports import *
 
 ### Paths and consts ### 
 #ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
@@ -30,23 +18,19 @@ import time
 
 ### HyperParams ###
 BATCH_SIZE = 64
-EPOCHS = 200
-LEARNING_RATE = 0.003
+EPOCHS = 50
+LEARNING_RATE = 0.0003
 #mel_spectrogram = torchaudio.transforms.MelSpectrogram(sample_rate=SAMPLE_RATE,n_fft=1024,hop_length=400,n_mels=64)
 
 ### DataSets ###
 #demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogram,SAMPLE_RATE,NUM_SAMPLES,device)
-demod_ds = ProcessedDataset('ProcessedTorchData.pt') #calling the after-processed dataset
-train_size = int(0.9 * len(demod_ds))
-test_size = len(demod_ds) - train_size
-#train_set, val_set = torch.utils.data.random_split(demod_ds, [train_size, test_size]) #I run this ones and saved the indexes with torch.save([train_set.indices,val_set.indices],'RandIndsSplit.pt')
+demod_ds = ProcessedDataset('ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
 [l1,l2] = torch.load('RandIndsSplit.pt') # we need to save the indexes so we wont have data contimanation
+assert len(list(set(l1).intersection(l2))) == 0
 train_set = torch.utils.data.Subset(demod_ds, l1)
 val_set = torch.utils.data.Subset(demod_ds, l2)
 print(f"There are {len(train_set)} samples in the train set and {len(val_set)} in validation set.")
 #How to get single sample for testing:   signal, label = demod_ds[0] ; signal.cpu().detach().numpy() ; %varexp --imshow sig
-
-## the pth i have is meaningless because I dont know how I splited the data!!!!!
 
 ### DataLoader ### 
 train_dataloader = DataLoader(train_set, batch_size=BATCH_SIZE,drop_last=True) #I need a fixed size bacth for the constractive loss
@@ -55,8 +39,8 @@ test_dataloader = DataLoader(val_set, batch_size=BATCH_SIZE)
 ### A neural network base encoder ###
 net = MyEmbeddingAndProjectionNet()
 net = net.cuda()
-net.load_state_dict(torch.load('MySimClR_Cost_2.9527862071990967.pth'))
- 
+net.load_state_dict(torch.load('MySimClR_Cost_2.957448959350586.pth'))
+
 ### contrastive loss function ###
 # https://kevinmusgrave.github.io/pytorch-metric-learning/distances/
 # https://zablo.net/blog/post/understanding-implementing-simclr-guide-eli5-pytorch/
@@ -80,22 +64,22 @@ for Epoch in range(EPOCHS):
         # GetBatchTime = np.append(GetBatchTime,time.time() - t)
         
         optimizer.zero_grad()
-        t = time.time()
+        #t = time.time()
         sig_a = MyRandomTransforms(batch) #The same random transform is implemented to the entire batch
         sig_b = MyRandomTransforms(batch) #The same random transform is implemented to the entire batch
         # TransformsTime = np.append(TransformsTime,time.time() - t)
         
-        t = time.time()
+        #t = time.time()
         projection_a = net(sig_a)[1] #index 1 is the projection
         projection_b = net(sig_b)[1] #index 1 is the projection
         # ForwardTime = np.append(ForwardTime,time.time() - t)
         
-        t = time.time()
+        #t = time.time()
         loss = loss_fn(projection_a,projection_b)
         # LossTime = np.append(LossTime,time.time() - t)
         Costs = np.append(Costs,loss.cpu().detach().numpy())
         
-        t = time.time()
+        #t = time.time()
         loss.backward()
         optimizer.step()
         # BackwardTime = np.append(BackwardTime,time.time() - t)

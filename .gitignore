@@ -12,5 +12,6 @@
 *.wav
 *.pth
 *.mat
+*.jpg
 # Pyotrch extention convention for tensors:
 *.pt
