@@ -4,6 +4,11 @@ Created on Wed Nov  3 14:52:19 2021
 
 @author: zahil
 """
+# Here I created 2 dataset:
+# 1. The DemodDataset - which works directly with Mat file I saved in matlab (The mat file was created by reading the dat files, pad\cut them)
+#    This DS enable us to choose the params for the MEL spectogram on the fly,but the The problem is that it takes a lot of time to process a single sample.
+#    Therefore I created another DS
+# 2. The ProcessedDataset - Read the file "ProcessedTorchData" which was created by a "one time run" script. basically it saved the sample after pre-process
 
 #import os
 import torch
@@ -13,8 +18,16 @@ import torchaudio
 import scipy.io as sio
 
 class ProcessedDataset(Dataset):
-    def __init__(self,Path):
-        [self.tensor,self.labels] = torch.load(Path)
+    def __init__(self,Path,label_ind = 1):
+        [self.tensor, label_1, label_2, label_3, label_4] = torch.load(Path)
+        if label_ind == 1:
+            self.labels = label_1
+        if label_ind == 2:
+            self.labels = label_2
+        if label_ind == 3:
+            self.labels = label_3
+        if label_ind == 4:
+            self.labels = label_4
         self.Len = self.tensor.shape[0]
     def __len__(self):
         return self.Len
@@ -35,7 +48,7 @@ class DemodDataset(Dataset):
                  device = "cpu"):
         self.annotations = pd.read_csv(annotations_file)
         self.audio_mat = sio.loadmat(audio_file)["DemodedMat"] #for now it is 3.2 second of burst sampled at 12.5Khz = 40,000 samples
-        self.desired_label = desired_label
+        self.desired_label = desired_label #Actually i am not using this
         self.device = device
         self.transformation = transformation.to(self.device)
         self.sample_rate = sample_rate
@@ -45,7 +58,10 @@ class DemodDataset(Dataset):
         return len(self.annotations)
 
     def __getitem__(self, index):
-        label = self.annotations.iloc[index, 1]
+        label_1 = self.annotations.iloc[index, 1] #HebOrEng
+        label_2 = self.annotations.iloc[index, 2] #GndOrAir
+        label_3 = self.annotations.iloc[index, 3] #CivOrArmy
+        label_4 = self.annotations.iloc[index, 4] #HaifaOrPluto
         signal = torch.tensor(self.audio_mat[index,:],dtype=torch.float32)
         signal = signal.to(self.device)
         #signal = self._resample_if_necessary(signal, sr) #done in matlab
@@ -54,7 +70,7 @@ class DemodDataset(Dataset):
         #signal = self._right_pad_if_necessary(signal)    #done in matlab
         signal = self.transformation(signal)
         signal = 20.0*torch.log10(signal+1e-10)
-        return signal, label
+        return signal, label_1, label_2, label_3, label_4
 
     # def _cut_if_necessary(self, signal):
     #     if signal.shape[1] > self.num_samples:
@@ -85,7 +101,7 @@ class DemodDataset(Dataset):
    
 if __name__ == "__main__":
     ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
-    AUDIO_FILE = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat'
+    AUDIO_FILE = 'E:\Projects\Flight\DLCode\CombinedDemoded.mat'
     desired_label = 'HebOrEng'
     SAMPLE_RATE = 12500
     NUM_SAMPLES = 40000
@@ -111,4 +127,4 @@ if __name__ == "__main__":
                             NUM_SAMPLES,
                             device)
     print(f"There are {len(demod_ds)} samples in the dataset.")
-    signal, label = demod_ds[0]
+    signal, label_1, label_2, label_3, label_4 = demod_ds[0]
