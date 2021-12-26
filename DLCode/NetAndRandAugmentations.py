@@ -33,9 +33,8 @@ class AddGaussianNoise(object):
 
 
 ##########################################################
-#TBD - create a new net with:
-    #1 
-    #2 small projection net
+# A net for the semi-supervised training:
+    
 class MyEmbeddingAndProjectionNet(nn.Module):     
         
     def __init__(self, embedding_size=32):
@@ -64,3 +63,34 @@ class MyEmbeddingAndProjectionNet(nn.Module):
 # keys = []
 # for name, value in net.named_parameters():
 #     keys.append(name)
+
+
+# A net for the supervised training 
+# Note that the forward is actually using only the "calculate_embedding" part and not the "projection" part, as they did in SimClr paper
+# I still not sure what is the point of using my "SecondNet" instead of the "projection"(which is discarded), but this is what they suggested in the paper..
+# See explanaion in SimCLR paper or at:
+# https://zablo.net/blog/post/understanding-implementing-simclr-guide-eli5-pytorch/
+    
+class InferenceNet(nn.Module):     
+        
+    def __init__(self,PretrainedFile=None):
+        super().__init__()
+        self.FirstNet = MyEmbeddingAndProjectionNet()
+        if PretrainedFile is not None:
+            self.FirstNet.load_state_dict(torch.load(PretrainedFile))
+            print('loaded weights from ' + PretrainedFile)
+        
+        # I will not use the "projection" net as SimClr suggested
+        self.SecondNet = nn.Sequential(
+            nn.Linear(in_features=64, out_features=32),
+            nn.ReLU(),
+            nn.Linear(in_features=32, out_features=12),
+            nn.ReLU(),
+            nn.Linear(in_features=12, out_features=1),
+            nn.Sigmoid()
+        )
+            
+    def forward(self, x):
+        embedding = self.FirstNet.calculate_embedding(x)
+        projection = self.SecondNet(embedding)
+        return projection
