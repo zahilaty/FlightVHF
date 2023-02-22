@@ -1,23 +1,30 @@
 # SimCLR for Aircraft Radio Communications
+This repository contains a partial implementation of SimCLR, a semi-supervised learning technique,
+applied to a unique dataset of VHF communication between aircraft pilots that was collected during 2021.  
+Some code is missing, and it will uploaded at a later time.
 
-This repository contains an implementation of SimCLR, a semi-supervised learning technique,
-applied to a unique dataset of VHF communication between aircraft pilots.
-The dataset was collected using a Raspberry Pi and a Flightware SDR,
-with a GNU Radio model developed for this project.
+![Mel spectogram of an audio record, transmitted in the VHF band at 2021](https://github.com/zahilaty/FlightVHF/blob/main/Example.jpg)
 
 # Dataset
+The dataset was collected with commercial COTS components: Raspberry Pi 3B, RTL-SDR dongle and VHF antenna (total cost < 100$).  
+A GNU Radio block that contains channalizer and spectral power detection recorded samples for off-line processing. 
+About 150 records out of ~8300 were labeled (see Labels.csv).  
 The dataset is not publicly available, as it was specifically collected for this project.
-It consists of a collection of VHF communication between aircraft pilots,
-and was preprocessed using mel-spectogram to create the inputs to the CNN.
 
-# Dataset
-The performance of the SimCLR model on the aircraft radio communication dataset was
-compared to using a variety of metrics, including accuracy, precision, recall, and F1 score.
-The results of these evaluations are provided in the results.txt file.
+# RF to audio
+The necessary signal filtering, demodulation, and other steps were performed using standard AM demodulation techniques,
+and the code for these steps will be uploaded at a later time
+
+# Audio pre-process
+Using torchaudio, mel spectograms were created "on the fly" (see DemodDataset.py)
+
+# Results
+The performance of the SimCLR model was compared to a straightforward supervised classifier.  
+Unfortunately, it does not appear that SimCLR achieved better performance.
 
 # Useful links:
-https://www.youtube.com/watch?v=trKjYdBASyQ  
-https://towardsdatascience.com/how-to-play-tic-tac-toe-using-reinforcement-learning-9604130e56f6
+https://www.youtube.com/c/ValerioVelardoTheSoundofAI?app=desktop  
+https://www.rtl-sdr.com/sdrsharp-users-guide/
 
 # License
 This project is licensed under the MIT License. See the LICENSE file for more information.
