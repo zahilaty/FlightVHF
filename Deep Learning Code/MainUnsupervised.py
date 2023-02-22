@@ -48,6 +48,7 @@ loss_fn = ContrastiveLoss(BATCH_SIZE)
 optimizer = torch.optim.Adam(net.parameters(),lr=LEARNING_RATE)
 
 ### transform ###
+# TBD - there is an error here -> transform get the mean and std you want to remove
 MyRandomTransforms = transforms.Compose([transforms.Normalize((0,), (1,)),transforms.RandomAffine(degrees = 0, translate=(0.2,0.15)),AddGaussianNoise(0., 1.)])
 
 #### TBD: A stochastic data augmentation module ###
