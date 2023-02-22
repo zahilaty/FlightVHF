@@ -7,7 +7,7 @@ Some code is missing, and it will uploaded at a later time.
 
 # Dataset
 The dataset was collected with commercial COTS components: Raspberry Pi 3B, RTL-SDR dongle and VHF antenna (total cost < 100$).  
-A GNU Radio block that contains channalizer and spectral power detection recorded samples for off-line processing. 
+A GNU Radio block that contains channalizer and spectral power detection module recorded samples for offline processing. 
 About 150 records out of ~8300 were labeled (see Labels.csv).  
 The dataset is not publicly available, as it was specifically collected for this project.
 
