@@ -17,8 +17,8 @@ LEARNING_RATE = 0.0003
 
 ### DataSets ###
 #demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogram,SAMPLE_RATE,NUM_SAMPLES,device)
-demod_ds = ProcessedDataset('ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
-[l1,l2] = torch.load('RandIndsSplit.pt') # already splitted to avoid data contamination
+demod_ds = ProcessedDataset('Data\ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
+[l1,l2] = torch.load('Data\RandIndsSplit.pt') # already splitted to avoid data contamination
 assert len(list(set(l1).intersection(l2))) == 0
 train_set = torch.utils.data.Subset(demod_ds, l1)
 val_set = torch.utils.data.Subset(demod_ds, l2)
@@ -32,7 +32,7 @@ test_dataloader = DataLoader(val_set, batch_size=BATCH_SIZE)
 ### A neural network base encoder ###
 net = MyEmbeddingAndProjectionNet()
 net = net.cuda()
-net.load_state_dict(torch.load('MySimClR_Cost_2.957448959350586.pth'))
+net.load_state_dict(torch.load('Weights\MySimClR_Cost_2.9545719623565674.pth'))
 
 ### contrastive loss function ###
 # https://kevinmusgrave.github.io/pytorch-metric-learning/distances/

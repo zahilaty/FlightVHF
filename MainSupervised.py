@@ -20,8 +20,8 @@ LEARNING_RATE = 0.0003
 
 ### DataSets ###
 #demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogram,SAMPLE_RATE,NUM_SAMPLES,device)
-demod_ds = ProcessedDataset('ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
-[l1,l2] = torch.load('RandIndsSplit.pt') # already splitted to avoid data contamination
+demod_ds = ProcessedDataset('Data\ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
+[l1,l2] = torch.load('Data\RandIndsSplit.pt') # already splitted to avoid data contamination
 assert len(list(set(l1).intersection(l2))) == 0
 train_set = torch.utils.data.Subset(demod_ds, l1[:83]) #Hard coded!! TODO: mark the samples that are tagged
 val_set = torch.utils.data.Subset(demod_ds, l2)
@@ -65,7 +65,7 @@ for Epoch in range(EPOCHS):
     net_A.train()
 
 ######### Part B - train with unsupervised pretraining
-net_B = InferenceNet('MySimClR_Cost_2.9545719623565674.pth')
+net_B = InferenceNet('Weights\MySimClR_Cost_2.9545719623565674.pth')
 net_B = net_B.cuda()
 loss_fn = nn.BCELoss(reduction='none') #Hard coded for now - the ratio of "1" to "0"
 optimizer_B = torch.optim.Adam(net_B.parameters(),lr=LEARNING_RATE)
