@@ -8,6 +8,7 @@ Created on Fri Dec 24 15:18:47 2021
 ### Imports ###
 from All_imports import *
 from NetAndRandAugmentations import InferenceNet
+import matplotlib.pyplot as plt
 
 ### HyperParams ###
 BATCH_SIZE = 3
@@ -28,7 +29,7 @@ print(f"There are {len(train_set)} samples in the train set and {len(val_set)} i
 train_dataloader = DataLoader(train_set, batch_size=len(train_set),drop_last=True) #I need a fixed size bacth for the constractive loss
 #test_dataloader = DataLoader(val_set, batch_size=val_set.dataset.__len__())
 
-######### Part A - train with out unsupervised pretraining
+######### Part A - train without unsupervised pretraining
 net_A = InferenceNet()
 net_A = net_A.cuda()
 loss_fn = nn.BCELoss(reduction='none')
@@ -60,7 +61,7 @@ for Epoch in range(EPOCHS):
         Costs_val_A = np.append(Costs_val_A,loss_val.cpu().detach().numpy())
     net_A.train()
 
-######### Part B - train with out unsupervised pretraining
+######### Part B - train after unsupervised pretraining
 net_B = InferenceNet('MySimClR_Cost_2.9545719623565674.pth')
 net_B = net_B.cuda()
 loss_fn = nn.BCELoss(reduction='none') #Hard coded for now - the ratio of "1" to "0"
@@ -90,3 +91,12 @@ for Epoch in range(EPOCHS):
         loss_val = loss_fn_val(p_val,target_val)
         Costs_val_B = np.append(Costs_val_B,loss_val.cpu().detach().numpy())
     net_B.train()
+    
+######## Ploting validation loss of SimCLR vs supervised
+plt.figure()
+plt.plot(Costs_val_A,'r',label='with direct supervised classifier')
+plt.plot(Costs_val_B,'g',label='with SimCLR unsupervised pretraining')
+plt.grid();plt.xlabel('iterations');plt.ylabel('BCE')
+
+
+
