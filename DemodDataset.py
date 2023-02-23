@@ -5,12 +5,14 @@ Created on Wed Nov  3 14:52:19 2021
 @author: zahil
 """
 # Here I created 2 dataset:
-# 1. The DemodDataset - which works directly with Mat file I saved in matlab (The mat file was created by reading the dat files, pad\cut them)
-#    This DS enable us to choose the params for the MEL spectogram on the fly,but the The problem is that it takes a lot of time to process a single sample.
-#    Therefore I created another DS
-# 2. The ProcessedDataset - Read the file "ProcessedTorchData" which was created by a "one time run" script. basically it saved the sample after pre-process
+# 1. The DemodDataset - which works directly with Mat file that I have saved
+#     in RF_to_audio.m (from RF samples to audio samples)
+#     This DS enable us to choose the params for the MEL spectogram on the fly,
+#     but the The problem is that it takes a lot of time to process a single sample
+# 2. The ProcessedDataset - Read the file "ProcessedTorchData" which was
+#     created by a "one time run" script. basically it saved the sample after 
+#     running DemodDataset pre-process
 
-#import os
 import torch
 from torch.utils.data import Dataset
 import pandas as pd
@@ -39,8 +41,8 @@ class ProcessedDataset(Dataset):
 class DemodDataset(Dataset):
 
     def __init__(self,
-                 annotations_file = 'E:\Projects\Flight\DLCode\Labels.csv',
-                 audio_file = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat',
+                 annotations_file = 'Data\Labels.csv',
+                 audio_file = 'Data\CombinedDemoded.mat',
                  desired_label = 'HebOrEng',
                  transformation = torchaudio.transforms.MelSpectrogram(sample_rate=12500,n_fft=1024,hop_length=512,n_mels=64),
                  sample_rate = 12500,
@@ -71,37 +73,13 @@ class DemodDataset(Dataset):
         signal = self.transformation(signal)
         signal = 20.0*torch.log10(signal+1e-10)
         return signal, label_1, label_2, label_3, label_4
-
-    # def _cut_if_necessary(self, signal):
-    #     if signal.shape[1] > self.num_samples:
-    #         signal = signal[:, :self.num_samples]
-    #     return signal
-
-    # def _right_pad_if_necessary(self, signal):
-    #     length_signal = signal.shape[1]
-    #     if length_signal < self.num_samples:
-    #         num_missing_samples = self.num_samples - length_signal
-    #         last_dim_padding = (0, num_missing_samples)
-    #         signal = torch.nn.functional.pad(signal, last_dim_padding)
-    #     return signal
-
-    # def _resample_if_necessary(self, signal, sr):
-    #     if sr != self.target_sample_rate:
-    #         resampler = torchaudio.transforms.Resample(sr, self.target_sample_rate)
-    #         signal = resampler(signal)
-    #     return signal
-
-    # def _mix_down_if_necessary(self, signal):
-    #     if signal.shape[0] > 1:
-    #         signal = torch.mean(signal, dim=0, keepdim=True)
-    #     return signal
+   
     
-    
-#####  It is good valerio implemented a "main" function so we can test the dataset directly without help of external script 
+#####  For Debug only:
    
 if __name__ == "__main__":
-    ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
-    AUDIO_FILE = 'E:\Projects\Flight\DLCode\CombinedDemoded.mat'
+    ANNOTATIONS_FILE = 'Data\Labels.csv'
+    AUDIO_FILE = 'DAta\CombinedDemoded.mat'
     desired_label = 'HebOrEng'
     SAMPLE_RATE = 12500
     NUM_SAMPLES = 40000

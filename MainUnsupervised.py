@@ -1,31 +1,24 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Nov  1 13:51:59 2021
-
+TODO:
+    1) too much code duplication regarding "MainSupervised"
+    2) need to verify the training loss again
 @author: zahil
 """
 
 ### Imports ###
 from All_imports import *
 
-### Paths and consts ### 
-#ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
-#AUDIO_FILE = 'E:\Projects\Flight\DLCode\HaifaDemoded.mat'
-#desired_label = 'HebOrEng'
-#SAMPLE_RATE = 12500
-#NUM_SAMPLES = 40000
-#device = "cuda"
-
 ### HyperParams ###
 BATCH_SIZE = 64
 EPOCHS = 50
 LEARNING_RATE = 0.0003
-#mel_spectrogram = torchaudio.transforms.MelSpectrogram(sample_rate=SAMPLE_RATE,n_fft=1024,hop_length=400,n_mels=64)
 
 ### DataSets ###
 #demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogram,SAMPLE_RATE,NUM_SAMPLES,device)
 demod_ds = ProcessedDataset('ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
-[l1,l2] = torch.load('RandIndsSplit.pt') # we need to save the indexes so we wont have data contimanation
+[l1,l2] = torch.load('RandIndsSplit.pt') # already splitted to avoid data contamination
 assert len(list(set(l1).intersection(l2))) == 0
 train_set = torch.utils.data.Subset(demod_ds, l1)
 val_set = torch.utils.data.Subset(demod_ds, l2)
@@ -48,11 +41,13 @@ loss_fn = ContrastiveLoss(BATCH_SIZE)
 optimizer = torch.optim.Adam(net.parameters(),lr=LEARNING_RATE)
 
 ### transform ###
-# TBD - there is an error here -> transform get the mean and std you want to remove
+# TODO: fix this bug and rerun (transform get the mean and std you want to remove)
 MyRandomTransforms = transforms.Compose([transforms.Normalize((0,), (1,)),transforms.RandomAffine(degrees = 0, translate=(0.2,0.15)),AddGaussianNoise(0., 1.)])
 
-#### TBD: A stochastic data augmentation module ###
+#### TODO: A stochastic data augmentation module ###
 Costs = np.array([])
+
+# For time profiler issues uncomment the following:
 # GetBatchTime = np.array([])
 # TransformsTime = np.array([])
 # ForwardTime = np.array([])
@@ -66,8 +61,9 @@ for Epoch in range(EPOCHS):
         
         optimizer.zero_grad()
         #t = time.time()
-        sig_a = MyRandomTransforms(batch) #The same random transform is implemented to the entire batch
-        sig_b = MyRandomTransforms(batch) #The same random transform is implemented to the entire batch
+        # The same random transform is implemented to the entire batch
+        sig_a = MyRandomTransforms(batch) 
+        sig_b = MyRandomTransforms(batch) 
         # TransformsTime = np.append(TransformsTime,time.time() - t)
         
         #t = time.time()
@@ -92,18 +88,4 @@ torch.save(net.state_dict(),'MySimClR_Cost_' + str(Costs[-1]) + '.pth')
 
 
 ### some figures
-# plot Costs
-# loss_fn(torch.randn((64,16)),torch.randn((64,16)))
-# tmp1 = batch.detach().cpu().numpy()
-# tmp2 = sig_a.detach().cpu().numpy()
-# tmp3 = sig_b.detach().cpu().numpy()
-
-# import matplotlib.pyplot as plt 
-# plt.figure()
-# plt.imshow(tmp1[16,:,:])
-# plt.figure()
-# plt.imshow(tmp2[16,:,:])
-# plt.figure()
-# plt.imshow(tmp3[16,:,:])
-# plt.figure()
-# plt.imshow(tmp4[16,:,:])
+# TODO: plot Costs

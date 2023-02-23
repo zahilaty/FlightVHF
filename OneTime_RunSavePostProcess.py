@@ -5,7 +5,7 @@ Created on Tue Dec  7 22:08:05 2021
 @author: zahil
 """
 
-# one time run to save each of the samples in new dataset to avoid real time transformations
+# One time run to save each of the audio records in new dataset to avoid real time pre-processing
 
 import torch
 import torchaudio
@@ -15,8 +15,8 @@ from torch.utils.data import Dataset, DataLoader
 from DemodDataset import DemodDataset
 
 ### Paths and consts ### 
-ANNOTATIONS_FILE = 'E:\Projects\Flight\DLCode\Labels.csv'
-AUDIO_FILE = 'E:\Projects\Flight\DLCode\CombinedDemoded.mat'
+ANNOTATIONS_FILE = 'Data\Labels.csv'
+AUDIO_FILE = 'Data\CombinedDemoded.mat'
 desired_label = 'HebOrEng'
 SAMPLE_RATE = 12500
 NUM_SAMPLES = 40000
@@ -52,7 +52,7 @@ for idx, [signal,label_1, label_2, label_3, label_4] in enumerate(dataloader):
     
 torch.save([X,Y1,Y2,Y3,Y4],'ProcessedTorchData.pt')
 
-### I ran this code offline to make sure the paradigma is correct:    
+### You can run this code to make sure the saving does not harm the data:    
 # torch.save([signal,label],'tmp')
 # [signal2,label2] = torch.load('tmp')
 # torch.eq(signal, signal2)

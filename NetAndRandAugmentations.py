@@ -13,7 +13,6 @@ from MyGeneralResNet18 import MyResNet18
 
 ##########################################################
 # Random Augmentations:
-    
 # 1) AWGN to all spectogram 
 # 2) Random shift in the time axis of about ~0.3 sec (done with RandomAffine)
 # 3) Random shift in the frequency axis of about 1000Hz (done with RandomAffine)
@@ -57,18 +56,11 @@ class MyEmbeddingAndProjectionNet(nn.Module):
         projection = self.projection(embedding)
         return embedding, projection
 
-#torch.isnan(sig_a).any()
-#net(torch.randn((64,64,101)).to('cuda:0'))
-
-# keys = []
-# for name, value in net.named_parameters():
-#     keys.append(name)
-
-
+##########################################################
 # A net for the supervised training 
 # Note that the forward is actually using only the "calculate_embedding" part and not the "projection" part, as they did in SimClr paper
 # I still not sure what is the point of using my "SecondNet" instead of the "projection"(which is discarded), but this is what they suggested in the paper..
-# See explanaion in SimCLR paper or at:
+# See more details in the SimCLR paper or at:
 # https://zablo.net/blog/post/understanding-implementing-simclr-guide-eli5-pytorch/
     
 class InferenceNet(nn.Module):     

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Dec 24 15:18:47 2021
-
+TODO:
+    1) Remove ASAP the hard coded numbers
+    2) Create a simplfied training function to avoid code duplication
+    3) debug both classifiers performance
 @author: zahil
 """
 
@@ -18,9 +21,9 @@ LEARNING_RATE = 0.0003
 ### DataSets ###
 #demod_ds = DemodDataset(ANNOTATIONS_FILE,AUDIO_FILE,desired_label,mel_spectrogram,SAMPLE_RATE,NUM_SAMPLES,device)
 demod_ds = ProcessedDataset('ProcessedTorchData.pt',label_ind = 1) #calling the after-processed dataset
-[l1,l2] = torch.load('RandIndsSplit.pt') # we need to save the indexes so we wont have data contimanation
+[l1,l2] = torch.load('RandIndsSplit.pt') # already splitted to avoid data contamination
 assert len(list(set(l1).intersection(l2))) == 0
-train_set = torch.utils.data.Subset(demod_ds, l1[:83]) #Hard coded!! TBD! the samples that are tagged
+train_set = torch.utils.data.Subset(demod_ds, l1[:83]) #Hard coded!! TODO: mark the samples that are tagged
 val_set = torch.utils.data.Subset(demod_ds, l2)
 print(f"There are {len(train_set)} samples in the train set and {len(val_set)} in validation set.")
 #How to get single sample for testing:   signal, label = demod_ds[0] ; signal.cpu().detach().numpy() ; %varexp --imshow sig
@@ -29,7 +32,7 @@ print(f"There are {len(train_set)} samples in the train set and {len(val_set)} i
 train_dataloader = DataLoader(train_set, batch_size=len(train_set),drop_last=True) #I need a fixed size bacth for the constractive loss
 #test_dataloader = DataLoader(val_set, batch_size=val_set.dataset.__len__())
 
-######### Part A - train without unsupervised pretraining
+######### Part A - train without the unsupervised pretraining
 net_A = InferenceNet()
 net_A = net_A.cuda()
 loss_fn = nn.BCELoss(reduction='none')
@@ -61,7 +64,7 @@ for Epoch in range(EPOCHS):
         Costs_val_A = np.append(Costs_val_A,loss_val.cpu().detach().numpy())
     net_A.train()
 
-######### Part B - train after unsupervised pretraining
+######### Part B - train with unsupervised pretraining
 net_B = InferenceNet('MySimClR_Cost_2.9545719623565674.pth')
 net_B = net_B.cuda()
 loss_fn = nn.BCELoss(reduction='none') #Hard coded for now - the ratio of "1" to "0"
@@ -94,7 +97,7 @@ for Epoch in range(EPOCHS):
     
 ######## Ploting validation loss of SimCLR vs supervised
 plt.figure()
-plt.plot(Costs_val_A,'r',label='with direct supervised classifier')
+plt.plot(Costs_val_A,'r',label='only supervised training')
 plt.plot(Costs_val_B,'g',label='with SimCLR unsupervised pretraining')
 plt.grid();plt.xlabel('iterations');plt.ylabel('BCE')
 

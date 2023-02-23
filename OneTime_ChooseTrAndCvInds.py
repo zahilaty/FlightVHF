@@ -4,7 +4,7 @@ Created on Thu Dec 23 22:00:31 2021
 
 @author: zahil
 """
-#I run this ones and saved the indexes with torch.save
+# This is a one-time run to split the dataset and save the splitting for better reproducibility
 
 import numpy as np
 import torch
@@ -17,11 +17,3 @@ np.random.shuffle(labeled_inds)
 val_inds = labeled_inds[labeled_half_len:]
 train_inds  =  np.concatenate((labeled_inds[:labeled_half_len],un_labeled_inds))
 torch.save([train_inds,val_inds],'RandIndsSplit.pt')
-
-# train_size = int(0.9 * len(demod_ds))
-# test_size = len(demod_ds) - train_size
-# train_set, val_set = torch.utils.data.random_split(demod_ds, [train_size, test_size])
-# torch.save([train_set.indices,val_set.indices],'RandIndsSplit.pt')
-
-# Make sure this is OK with:
-# list(set(train_set.indices).intersection(val_set.indices))
