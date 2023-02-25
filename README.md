@@ -6,7 +6,7 @@ Some code is missing (or pointing on local paths), and it will uploaded at a lat
 ![Mel spectogram of an audio record, transmitted in the VHF band at 2021](https://github.com/zahilaty/FlightVHF/blob/main/Images/MelSpecExample.jpg)
 
 # Dataset
-The dataset was collected with commercial COTS components: Raspberry Pi 3b, RTL-SDR dongle and VHF antenna (total cost < 100$).  
+I have collected the dataset with commercial COTS components: Raspberry Pi 3b, RTL-SDR dongle and VHF antenna (total cost < 100$).  
 A GNU Radio block that contains channalizer and spectral power detection module recorded samples for offline processing. 
 About 150 records out of ~8300 were labeled (see Labels.csv).  
 The dataset is not publicly available, as it was specifically collected for this project.
